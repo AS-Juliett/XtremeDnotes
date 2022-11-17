@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.EditNoteActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+            <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appbarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                android:elevation="4dp"/>
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <EditText
+            android:id="@+id/editTextTextMultiLine"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:ems="10"
+            android:gravity="start|top"
+            android:inputType="textMultiLine" />
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

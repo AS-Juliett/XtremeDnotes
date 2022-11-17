@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Xtreme Dnotes</string>
+    <string name="note_title">Note title</string>
+    <string name="import_menu">Import</string>
+    <string name="save_menu">Save</string>
+    <string name="export_menu">Export</string>
+    <string name="settings_menu">Settings</string>
+    <string name="all_notes_menu">All notes</string>
+    <string name="password_hint">Password</string>
+    <string name="open">Open</string>
+    <string name="reset_password">Reset password</string>
+    <string name="navigation_drawer_open">Open Navigation Drawer</string>
+    <string name="navigation_drawer_close">Close Navigation Drawer</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
