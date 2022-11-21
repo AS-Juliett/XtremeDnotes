@@ -2,11 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.xtremednotes">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -15,19 +10,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BadApp">
         <activity
-            android:name="com.example.xtremednotes.activity.PasswordActivity"
+            android:name=".activity.ManageCategoriesActivity"
             android:exported="false" />
         <activity
-            android:name="com.example.xtremednotes.activity.EditNoteActivity"
+            android:name=".activity.PasswordActivity"
             android:exported="false" />
         <activity
-            android:name="com.example.xtremednotes.activity.ImportActivity"
+            android:name=".activity.EditNoteActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.ImportActivity"
             android:exported="true" />
         <activity
-            android:name="com.example.xtremednotes.activity.NotesNavigationActivity"
+            android:name=".activity.NotesNavigationActivity"
             android:exported="true" />
         <activity
-            android:name="com.example.xtremednotes.activity.MainActivity"
+            android:name=".activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,5 +34,10 @@
             </intent-filter>
         </activity>
     </application>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
 </manifest>

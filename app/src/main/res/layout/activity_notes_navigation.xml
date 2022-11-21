@@ -24,9 +24,9 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:elevation="4dp"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                app:popupTheme="@style/Theme.AppCompat.Light"
-                android:elevation="4dp"/>
+                app:popupTheme="@style/Theme.AppCompat.Light" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -34,7 +34,6 @@
             android:id="@+id/frameLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-
     </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView
@@ -43,6 +42,22 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:menu="@menu/nav_drawer_menu"
-        app:headerLayout="@layout/nav_header_layout"/>
+        app:headerLayout="@layout/nav_header_layout"
+        app:menu="@menu/nav_drawer_menu" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:orientation="vertical">
+        <Button
+            android:id="@+id/manageButton"
+            android:background="@drawable/rounded_btn"
+            android:text="Manage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="10dp"/>
+        </LinearLayout>
+    </com.google.android.material.navigation.NavigationView>
 </androidx.drawerlayout.widget.DrawerLayout>

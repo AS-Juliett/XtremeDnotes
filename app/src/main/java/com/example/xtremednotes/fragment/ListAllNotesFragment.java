@@ -46,14 +46,17 @@ public class ListAllNotesFragment extends Fragment {
     private View view;
     private ArrayList<Note> notesList;
     private NotesAdapter notesAdapter;
-    LayoutInflater inflater;
+    private String filter;
     private String exportName = "export";
+
+    public ListAllNotesFragment(String filter){
+        this.filter = filter;
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        this.inflater = inflater;
         view = inflater.inflate(R.layout.fragment_list_all_notes, container,false);
         setHasOptionsMenu(true);
 
@@ -74,7 +77,7 @@ public class ListAllNotesFragment extends Fragment {
                     builder.setTitle("Confirm");
                     builder.setMessage("Delete " + note.getTitle() + "?");
                     builder.setPositiveButton("Yes", (dialog, which) -> {
-                        File file = new File(getActivity().getFilesDir() + "/" + note.getTitle());
+                        File file = new File(getActivity().getFilesDir(), note.getTitle());
                         if(file.exists()){
                             file.delete();
                             Toast.makeText(view.getContext(), note.getTitle()+" deleted",
@@ -149,7 +152,14 @@ public class ListAllNotesFragment extends Fragment {
 
     private void loadAllFiles(){
         notesList.clear();
-        File dir = getActivity().getFilesDir();
+        String defaultDir = "Uncategorized";
+        File dir;
+
+        if(filter == null || filter.equals(defaultDir)) {
+            dir = getActivity().getFilesDir();
+        } else {
+            dir = new File(getActivity().getFilesDir(), filter);
+        }
         File[] files = Arrays.stream(dir.listFiles())
                 .filter(f -> f.getName().endsWith(".txt"))
                 .collect(Collectors.toList()).toArray(new File[]{});

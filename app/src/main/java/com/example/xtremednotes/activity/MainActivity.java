@@ -14,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.xtremednotes.Config;
+import com.example.xtremednotes.ConfigUtil;
 import com.example.xtremednotes.EncryptedFileManager;
 import com.example.xtremednotes.R;
 
@@ -23,15 +24,6 @@ public class MainActivity extends AppCompatActivity {
 
     private CircleImageView imageView = null;
     private boolean needsKey = false;
-
-    public void setAvatar(){
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        String avatarPath = sharedPref.getString("imagePath", null);
-        imageView.setImageResource(R.mipmap.ic_default_avatar_foreground);
-        if(avatarPath != null && new File(this.getFilesDir()+avatarPath).exists()){
-            imageView.setImageURI(Uri.fromFile(new File(this.getFilesDir()+avatarPath)));
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +35,8 @@ public class MainActivity extends AppCompatActivity {
         mainPasswordInput.setHint(R.string.password_hint);
         ImageButton buttonVerifyPassword = findViewById(R.id.imageButton);
 
-        this.imageView = findViewById(R.id.imageview);
-        this.setAvatar();
+        imageView = findViewById(R.id.imageview);
+        ConfigUtil.setAvatar(this, imageView);
 
         buttonVerifyPassword.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -69,6 +61,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Config.getInstance().load();
-        this.setAvatar();
+        ConfigUtil.setAvatar(this, imageView);
     }
 }
