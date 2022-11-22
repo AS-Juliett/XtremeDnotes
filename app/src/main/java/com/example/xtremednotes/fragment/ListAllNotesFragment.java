@@ -176,7 +176,7 @@ public class ListAllNotesFragment extends Fragment {
                     .filter(f -> f.getName().endsWith(".txt"))
                     .collect(Collectors.toList()).toArray(new File[]{});
             for (int i = 0; i < files.length; i++) {
-                notesList.add(new Note(files[i].getName(), fld.getName()));
+                notesList.add(new Note(FileUtil.toNoteName(files[i].getName()), fld.getName()));
             }
         }
     }

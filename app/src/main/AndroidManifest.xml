@@ -21,10 +21,10 @@
             android:exported="false" />
         <activity
             android:name=".activity.ImportActivity"
-            android:exported="true" />
+            android:exported="false" />
         <activity
             android:name=".activity.NotesNavigationActivity"
-            android:exported="true" />
+            android:exported="false" />
         <activity
             android:name=".activity.MainActivity"
             android:exported="true">
@@ -36,9 +36,5 @@
         </activity>
     </application>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
 </manifest>

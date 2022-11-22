@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "New password set", Toast.LENGTH_SHORT).show();
                     MainActivity.this.needsKey = false;
                 }
+                EncryptedFileManager.getInstance().updateVersion(MainActivity.this);
                 Intent intent = new Intent(v.getContext(), NotesNavigationActivity.class);
                 startActivity(intent);
                 mainPasswordInput.setText("");
