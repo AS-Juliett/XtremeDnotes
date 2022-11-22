@@ -1,6 +1,8 @@
 package com.example.xtremednotes;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -15,6 +17,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -65,32 +68,41 @@ public class EncryptedFileManager {
     public void updateDefaultKey(Context ctx, String key) {
         byte[] hash = this.hashKey(key);
         this.setKey(hash);
-        File pw = new File(ctx.getFilesDir(), PASSWORD_FILENAME);
-        try {
-            FileOutputStream fos = new FileOutputStream(pw);
-            fos.write(hash);
-            fos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        outputMgr.write(hash);
+    }
+
+    public static final String STORE_VERSION_KEY = "store_version";
+    public static final String STORE_VERSION_CURRENT = "2";
+
+    private IPasswordManager getPasswordManager(Context ctx, String version) {
+        switch (version) {
+            case "1":
+                return new PasswordManagerV1(ctx);
+            case "2":
+                return new PasswordManagerV2(ctx);
+            default:
+                return null;
         }
     }
+
+    private IPasswordManager inputMgr;
+    private IPasswordManager outputMgr;
 
     public boolean tryInitKey(Context ctx) {
         if (this.defaultKey != null) {
             return true;
         }
-        File pw = new File(ctx.getFilesDir(), PASSWORD_FILENAME);
-        try {
-            FileInputStream fos = new FileInputStream(pw);
-            byte[] hash = new byte[32];
-            fos.read(hash);
-            this.setKey(hash);
-            fos.close();
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
+        String version = sharedPref.getString(STORE_VERSION_KEY, "1");
+
+        inputMgr = getPasswordManager(ctx, version);
+        if (version.equals(STORE_VERSION_CURRENT)) {
+            outputMgr = inputMgr;
+        } else {
+            outputMgr = getPasswordManager(ctx, STORE_VERSION_CURRENT);
         }
-        return false;
+
+        return inputMgr.read();
     }
 
     public void clearKey() {
@@ -99,8 +111,16 @@ public class EncryptedFileManager {
     }
 
     public boolean verify(String password) {
-        byte[] tmp = this.hashKey(password);
-        return Arrays.equals(tmp, this.rawKey);
+        byte[] res = inputMgr.verify(password);
+        if (res == null) {
+            return false;
+        }
+        setKey(res);
+        if (inputMgr != outputMgr) {
+            outputMgr.write(res);
+            inputMgr = outputMgr;
+        }
+        return true;
     }
 
     public File saveFile(Context ctx, String filename, byte[] content) throws FileNotFoundException {
@@ -198,7 +218,7 @@ public class EncryptedFileManager {
             e.printStackTrace();
         }
         ZipInputStream zis = new ZipInputStream(cis);
-        ZipEntry ze = null;
+        ZipEntry ze;
         ArrayList<String> al = new ArrayList<>();
         while (true) {
             try {
@@ -222,21 +242,33 @@ public class EncryptedFileManager {
         return al;
     }
 
+    private void traverse(File dir, Consumer<File> ff) {
+        for (File f : dir.listFiles()) {
+            if (f.isDirectory()) {
+                traverse(f, ff);
+            } else if (!f.getName().endsWith(".txt")) {
+                continue;
+            } else {
+                ff.accept(f);
+            }
+        }
+    }
     public void export(Context ctx, String filePath) {
         File fo = new File(filePath);
         try {
             CipherOutputStream cos = new CipherOutputStream(new FileOutputStream(fo), this.getCipher(Cipher.ENCRYPT_MODE));
             ZipOutputStream zos = new ZipOutputStream(cos);
-            for (File f : ctx.getFilesDir().listFiles()) {
-                if (!f.getName().endsWith(".txt")) {
-                    continue;
+            traverse(ctx.getFilesDir(), (File f) -> {
+                try {
+                    zos.putNextEntry(new ZipEntry(f.getName()));
+                    FileInputStream fis = new FileInputStream(f);
+                    CipherInputStream cis = new CipherInputStream(fis, this.getCipher(Cipher.DECRYPT_MODE));
+                    FileUtil.transfer(cis, zos);
+                    cis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                zos.putNextEntry(new ZipEntry(f.getName()));
-                FileInputStream fis = new FileInputStream(f);
-                CipherInputStream cis = new CipherInputStream(fis, this.getCipher(Cipher.DECRYPT_MODE));
-                FileUtil.transfer(cis, zos);
-                cis.close();
-            }
+            });
             zos.close();
         } catch (IOException e) {
             e.printStackTrace();
