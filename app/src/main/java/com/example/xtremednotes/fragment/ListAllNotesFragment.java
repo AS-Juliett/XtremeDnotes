@@ -40,6 +40,7 @@ import java.io.File;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -72,14 +73,15 @@ public class ListAllNotesFragment extends Fragment {
         recyclerView.setLayoutManager(new GridLayoutManager(view.getContext(),3));
 
         notesAdapter = new NotesAdapter(notesList,
-                note -> openNote(note.getTitle()),
+                note -> openNote(note.getFullName()),
                 (adapter, note) -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
 
                     builder.setTitle("Confirm");
                     builder.setMessage("Delete " + note.getTitle() + "?");
                     builder.setPositiveButton("Yes", (dialog, which) -> {
-                        File file = new File(getActivity().getFilesDir(), note.getTitle());
+
+                        File file = new File(getActivity().getFilesDir(), note.getFullName());
                         if(file.exists()){
                             file.delete();
                             Toast.makeText(view.getContext(), note.getTitle()+" deleted",
@@ -172,7 +174,8 @@ public class ListAllNotesFragment extends Fragment {
         }
 
         for(File fld: folders){
-            File[] files = Arrays.stream(fld.listFiles())
+            File[] fileList = fld.listFiles();
+            File[] files = Arrays.stream(fileList != null ? fileList : new File[]{})
                     .filter(f -> f.getName().endsWith(".txt"))
                     .collect(Collectors.toList()).toArray(new File[]{});
             for (int i = 0; i < files.length; i++) {

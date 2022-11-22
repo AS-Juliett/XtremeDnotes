@@ -1,6 +1,7 @@
 package com.example.xtremednotes.model;
 
 import com.example.xtremednotes.R;
+import com.example.xtremednotes.util.FileUtil;
 
 public class Note {
 
@@ -31,6 +32,15 @@ public class Note {
 
     public String getFolder(){
         return this.folder;
+    }
+
+    public String getFullName() {
+        String cat = getFolder();
+        String noteFileName = FileUtil.fromNoteName(getTitle());
+        if (!cat.equals("files")) {
+            noteFileName = cat + "/" + noteFileName;
+        }
+        return noteFileName;
     }
 
     public int getImg(){

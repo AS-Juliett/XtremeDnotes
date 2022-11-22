@@ -47,7 +47,7 @@ public class FileUtil {
         if (tokens.length < 2) {
             return fileName;
         }
-        return new String(Base64.getDecoder().decode(tokens[0]), StandardCharsets.UTF_8) + "." + tokens[1];
+        return new String(Base64.getDecoder().decode(tokens[0].replace("_", "/")), StandardCharsets.UTF_8) + "." + tokens[1];
     }
 
     public static String fromNoteName(String noteName) {
@@ -55,7 +55,7 @@ public class FileUtil {
         if (tokens.length < 2) {
             return noteName;
         }
-        return Base64.getEncoder().encodeToString(tokens[0].getBytes(StandardCharsets.UTF_8)) + "." + tokens[1];
+        return Base64.getEncoder().encodeToString(tokens[0].getBytes(StandardCharsets.UTF_8)).replace("/", "_") + "." + tokens[1];
     }
 
 }

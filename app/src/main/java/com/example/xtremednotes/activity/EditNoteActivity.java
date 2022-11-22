@@ -42,14 +42,14 @@ public class EditNoteActivity extends AppCompatActivity {
     private void saveNote() {
         String noteContent = noteText.getText().toString();
         try {
-            EncryptedFileManager.getInstance().saveFile(this, FileUtil.fromNoteName(editName), noteContent.getBytes(StandardCharsets.UTF_8));
+            EncryptedFileManager.getInstance().saveFile(this, editName, noteContent.getBytes(StandardCharsets.UTF_8));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
 
     private boolean validateTitle(String noteTitle){
-        File file = new File(getFilesDir(),noteTitle+".txt");
+        File file = new File(getFilesDir(),noteTitle);
         return file.exists();
     }
 
@@ -71,13 +71,13 @@ public class EditNoteActivity extends AppCompatActivity {
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            String noteTitle = et.getText().toString();
+                            String noteTitle = FileUtil.fromNoteName(et.getText().toString() + ".txt");
                             if(validateTitle(noteTitle)){
                                 Toast.makeText(EditNoteActivity.this,
                                         "Note with given title already exists",
                                         Toast.LENGTH_SHORT).show();
                             } else {
-                                editName = noteTitle + ".txt";
+                                editName = noteTitle;
                                 Intent data = new Intent();
                                 data.putExtra("NOTE_TITLE", editName);
                                 setResult(RESULT_OK, data);
@@ -111,10 +111,11 @@ public class EditNoteActivity extends AppCompatActivity {
             editName = extras.getString(EDIT_NAME_KEY);
         }
         if (editName != null) {
-            String fileName = FileUtil.fromNoteName(editName);
-            getSupportActionBar().setTitle(editName.substring(0, editName.lastIndexOf(".")));
+            String tokens[] = editName.split("/");
+            String notName = FileUtil.toNoteName(tokens[tokens.length-1]);
+            getSupportActionBar().setTitle(notName.substring(0, notName.lastIndexOf(".")));
             try {
-                byte[] byts = EncryptedFileManager.getInstance().readFile(new File(getFilesDir(), fileName));
+                byte[] byts = EncryptedFileManager.getInstance().readFile(new File(getFilesDir(), editName));
                 Log.d("WKD", ""+byts.length);
                 noteText.setText(new String(byts));
             } catch (FileNotFoundException e) {

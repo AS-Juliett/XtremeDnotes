@@ -76,11 +76,11 @@ public class ConfigUtil {
     }
 
     public static String encodeBase64(String string){
-        return Base64.getEncoder().encodeToString(string.getBytes());
+        return Base64.getEncoder().encodeToString(string.getBytes()).replace("/", "_");
     }
 
     public static String decodeBase64(String string){
-        byte[] decodedBytes = Base64.getDecoder().decode(string);
+        byte[] decodedBytes = Base64.getDecoder().decode(string.replace("_", "/"));
         return new String(decodedBytes);
     }
 }
