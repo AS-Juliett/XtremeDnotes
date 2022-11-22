@@ -34,32 +34,38 @@ import java.util.Base64;
 public class EditNoteActivity extends AppCompatActivity {
 
     public static String EDIT_NAME_KEY = "editName";
+    public static String FOLDER_KEY = "folder";
     private Toolbar toolbar;
     private String editName;
+    private String folderName;
     private EditText noteText;
     private String selectedFolder;
 
     private void saveNote() {
         String noteContent = noteText.getText().toString();
         try {
-            EncryptedFileManager.getInstance().saveFile(this, FileUtil.fromNoteName(editName), noteContent.getBytes(StandardCharsets.UTF_8));
+            EncryptedFileManager.getInstance().saveFile(this, FileUtil.fromNoteName(editName), selectedFolder, noteContent.getBytes(StandardCharsets.UTF_8));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
 
     private boolean validateTitle(String noteTitle){
-        File file = new File(getFilesDir(),noteTitle+".txt");
-        return file.exists();
-    }
-
-    private boolean validate(){
-        if(editName != null){
-            File fileParent = new File(getFilesDir(), selectedFolder);
-            File file = new File(fileParent, editName+".txt");
+        if(selectedFolder != null){
+            return validate(noteTitle);
+        } else {
+            File file = new File(getFilesDir(),noteTitle+".txt");
             return file.exists();
         }
-        return true;
+    }
+
+    private boolean validate(String noteTile){
+        if(editName != null){
+            File fileParent = new File(getFilesDir(), selectedFolder);
+            File file = new File(fileParent, noteTile+".txt");
+            return file.exists();
+        }
+        return false;
     }
 
     public void onClickSaveNote() {
@@ -80,6 +86,7 @@ public class EditNoteActivity extends AppCompatActivity {
                                 editName = noteTitle + ".txt";
                                 Intent data = new Intent();
                                 data.putExtra("NOTE_TITLE", editName);
+                                data.putExtra("NOTE_FOLDER", selectedFolder);
                                 setResult(RESULT_OK, data);
                                 saveNote();
                                 EditNoteActivity.this.finish();
@@ -97,7 +104,6 @@ public class EditNoteActivity extends AppCompatActivity {
         }
     }
 
-    @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,6 +115,8 @@ public class EditNoteActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             editName = extras.getString(EDIT_NAME_KEY);
+            folderName = extras.getString(FOLDER_KEY);
+            selectedFolder = folderName;
         }
         if (editName != null) {
             String fileName = FileUtil.fromNoteName(editName);
@@ -157,21 +165,16 @@ public class EditNoteActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         selectedFolder = ConfigUtil.encodeBase64(folderSelector.getSelectedItem().toString());
-                        if(validate()){
+                        if(validate(editName)){
                             Toast.makeText(EditNoteActivity.this,
                                     "Note with the same title already exists in the selected folder",
                                     Toast.LENGTH_SHORT).show();
-                        } else {
-                            moveNote();
+                            selectedFolder = folderName;
                         }
                     }
                 })
                 .setNegativeButton("Cancel", null)
                 .create()
                 .show();
-    }
-
-    public void moveNote(){
-
     }
 }
