@@ -3,6 +3,7 @@
     <string name="note_title">Note title</string>
     <string name="import_menu">Import</string>
     <string name="save_menu">Save</string>
+    <string name="save_color">Color</string>
     <string name="export_menu">Export</string>
     <string name="settings_menu">Settings</string>
     <string name="all_notes_menu">All notes</string>

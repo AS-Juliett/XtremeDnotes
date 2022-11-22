@@ -6,11 +6,14 @@ import androidx.appcompat.widget.Toolbar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.xtremednotes.EncryptedFileManager;
@@ -26,6 +29,12 @@ public class EditNoteActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private String editName;
     private EditText noteText;
+
+    private void saveColor(int color) {
+
+        LinearLayout background = findViewById(R.id.background); // where background is the id in xml
+        background.setBackgroundColor(color); // your_color - your variable, user's choice
+    }
 
     private void saveNote() {
         String noteContent = noteText.getText().toString();
@@ -61,6 +70,7 @@ public class EditNoteActivity extends AppCompatActivity {
                                 data.putExtra("NOTE_TITLE", editName);
                                 setResult(RESULT_OK, data);
                                 saveNote();
+                                // saveColor();   TODO: how I can get the user's choice
                                 EditNoteActivity.this.finish();
                             }
                         }
@@ -70,6 +80,7 @@ public class EditNoteActivity extends AppCompatActivity {
                     .show();
         } else {
             saveNote();
+            // saveColor();   TODO: how I can get the user's choice
             Toast.makeText(EditNoteActivity.this,
                     "Saved changes",
                     Toast.LENGTH_SHORT).show();
