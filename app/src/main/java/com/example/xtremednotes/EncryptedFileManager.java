@@ -3,13 +3,18 @@ package com.example.xtremednotes;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -51,8 +56,10 @@ public class EncryptedFileManager {
     private void setKey(byte[] key) {
         this.rawKey = key;
         defaultKey = new SecretKeySpec(key, "AES");
-        byte[] ivBytes = new byte[16];
-        iv = new IvParameterSpec(ivBytes);
+        if (iv == null) {
+            byte[] ivBytes = new byte[16];
+            iv = new IvParameterSpec(ivBytes);
+        }
     }
 
     public byte[] hashKey(String key) {
@@ -65,8 +72,36 @@ public class EncryptedFileManager {
         return null;
     }
 
+    private void traverse(File dir, Consumer<File> ff) {
+        for (File f : dir.listFiles()) {
+            if (f.isDirectory()) {
+                traverse(f, ff);
+            } else if (!f.getName().endsWith(".txt")) {
+                continue;
+            } else {
+                ff.accept(f);
+            }
+        }
+    }
+
+    private void reencrypt(File f, SecretKey sk) {
+        try {
+            CipherInputStream cis = new CipherInputStream(new FileInputStream(f), this.getCipher(Cipher.DECRYPT_MODE));
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            FileUtil.transfer(cis, bos);
+            cis.close();
+            CipherOutputStream cos = new CipherOutputStream(new FileOutputStream(f), this.getCipher(sk, Cipher.ENCRYPT_MODE));
+            cos.write(bos.toByteArray());
+            cos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void updateDefaultKey(Context ctx, String key) {
         byte[] hash = this.hashKey(key);
+        SecretKey sk = new SecretKeySpec(hash, "AES");
+        traverse(ctx.getFilesDir(), (File f) -> reencrypt(f, sk));
         this.setKey(hash);
         outputMgr.write(hash);
     }
@@ -156,15 +191,6 @@ public class EncryptedFileManager {
         return bos.toByteArray();
     }
 
-    public void cleanDir(File dir) {
-        for (File f : dir.listFiles()) {
-            if (f.isDirectory()) {
-                cleanDir(f);
-            }
-            f.delete();
-        }
-    }
-
     private Cipher getCipher(SecretKey sk, int mode) {
         Cipher cipher;
         try {
@@ -242,17 +268,6 @@ public class EncryptedFileManager {
         return al;
     }
 
-    private void traverse(File dir, Consumer<File> ff) {
-        for (File f : dir.listFiles()) {
-            if (f.isDirectory()) {
-                traverse(f, ff);
-            } else if (!f.getName().endsWith(".txt")) {
-                continue;
-            } else {
-                ff.accept(f);
-            }
-        }
-    }
     public void export(Context ctx, String filePath) {
         File fo = new File(filePath);
         try {
