@@ -64,7 +64,7 @@ public class ListAllNotesFragment extends Fragment {
         setHasOptionsMenu(true);
 
         FloatingActionButton button = (FloatingActionButton) view.findViewById(R.id.floatingActionButtonCreate);
-        button.setOnClickListener(v -> openNote(null));
+        button.setOnClickListener(v -> openNote(null, null));
 
         notesList = new ArrayList<>();
         loadAllFiles();
@@ -73,7 +73,7 @@ public class ListAllNotesFragment extends Fragment {
         recyclerView.setLayoutManager(new GridLayoutManager(view.getContext(),3));
 
         notesAdapter = new NotesAdapter(notesList,
-                note -> openNote(note.getFullName()),
+                note -> openNote(note.getTitle(), note.getFolder()),
                 (adapter, note) -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
 
@@ -146,10 +146,11 @@ public class ListAllNotesFragment extends Fragment {
                 .show();
     }
 
-    private void openNote(String noteName) {
+    private void openNote(String noteName, String folderName) {
         Intent i = new Intent(view.getContext(), EditNoteActivity.class);
         if (noteName != null) {
             i.putExtra(EditNoteActivity.EDIT_NAME_KEY, noteName);
+            i.putExtra(EditNoteActivity.FOLDER_KEY, folderName);
         }
         startActivityForResult(i, 77);
     }

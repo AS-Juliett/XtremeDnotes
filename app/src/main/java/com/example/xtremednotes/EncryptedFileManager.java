@@ -194,8 +194,14 @@ public class EncryptedFileManager {
         sharedPref.edit().putString(STORE_VERSION_KEY, newAppVersion).commit();
     }
 
-    public File saveFile(Context ctx, String filename, byte[] content) throws FileNotFoundException {
-        File file = new File(ctx.getFilesDir(), filename);
+    public File saveFile(Context ctx, String filename, String folder, byte[] content) throws FileNotFoundException {
+        File file;
+        if(folder == null){
+            file = new File(ctx.getFilesDir(), filename);
+        } else{
+            File parent = new File(ctx.getFilesDir(), folder);
+            file = new File(parent, filename);
+        }
         CipherOutputStream cos = new CipherOutputStream(new FileOutputStream(file), this.getCipher(Cipher.ENCRYPT_MODE));
         try {
             cos.write(content);
