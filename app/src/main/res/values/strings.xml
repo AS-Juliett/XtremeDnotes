@@ -1,15 +1,19 @@
 <resources>
     <string name="app_name">Xtreme Dnotes</string>
     <string name="note_title">Note title</string>
+    <string name="folder_name">Folder name</string>
+    <string name="select_folder_menu">Select folder</string>
     <string name="import_menu">Import</string>
     <string name="save_menu">Save</string>
     <string name="export_menu">Export</string>
     <string name="settings_menu">Settings</string>
     <string name="all_notes_menu">All notes</string>
     <string name="password_hint">Password</string>
+    <string name="folder_hint">Folder name</string>
     <string name="open">Open</string>
+    <string name="create">Create</string>
     <string name="reset_password">Reset password</string>
     <string name="navigation_drawer_open">Open Navigation Drawer</string>
     <string name="navigation_drawer_close">Close Navigation Drawer</string>
-    <string name="manage">Manage categories</string>
+    <string name="manage">Manage</string>
 </resources>

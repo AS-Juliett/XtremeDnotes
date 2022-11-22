@@ -1,4 +1,4 @@
-package com.example.xtremednotes;
+package com.example.xtremednotes.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.xtremednotes.R;
 import com.example.xtremednotes.model.Note;
 
 import java.util.ArrayList;

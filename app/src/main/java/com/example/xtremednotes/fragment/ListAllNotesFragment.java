@@ -27,8 +27,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.xtremednotes.EncryptedFileManager;
-import com.example.xtremednotes.FileUtil;
-import com.example.xtremednotes.NotesAdapter;
+import com.example.xtremednotes.util.ConfigUtil;
+import com.example.xtremednotes.util.FileUtil;
+import com.example.xtremednotes.adapter.NotesAdapter;
 import com.example.xtremednotes.R;
 import com.example.xtremednotes.activity.EditNoteActivity;
 import com.example.xtremednotes.activity.ImportActivity;
@@ -39,6 +40,7 @@ import java.io.File;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ListAllNotesFragment extends Fragment {
@@ -153,19 +155,29 @@ public class ListAllNotesFragment extends Fragment {
     private void loadAllFiles(){
         notesList.clear();
         String defaultDir = "Uncategorized";
-        File dir;
+        ArrayList<File> folders = new ArrayList<>();
 
-        if(filter == null || filter.equals(defaultDir)) {
-            dir = getActivity().getFilesDir();
+        if(filter == null){
+            String[] allFolders = ConfigUtil.convertObjectBase64(ConfigUtil.getFolders(getActivity()));
+            for(String folder: allFolders){
+                File f = new File(getActivity().getFilesDir(), folder);
+                folders.add(f);
+            }
+            folders.add(getActivity().getFilesDir());
+        } else if(filter.equals(defaultDir)){
+            folders.add(getActivity().getFilesDir());
         } else {
-            dir = new File(getActivity().getFilesDir(), filter);
+            File f = new File(getActivity().getFilesDir(), ConfigUtil.encodeBase64(filter));
+            folders.add(f);
         }
-        File[] files = Arrays.stream(dir.listFiles())
-                .filter(f -> f.getName().endsWith(".txt"))
-                .collect(Collectors.toList()).toArray(new File[]{});
-        assert files != null;
-        for (int i = 0; i < files.length; i++) {
-            notesList.add(new Note(files[i].getName(),R.mipmap.ic_note_foreground));
+
+        for(File fld: folders){
+            File[] files = Arrays.stream(fld.listFiles())
+                    .filter(f -> f.getName().endsWith(".txt"))
+                    .collect(Collectors.toList()).toArray(new File[]{});
+            for (int i = 0; i < files.length; i++) {
+                notesList.add(new Note(files[i].getName(), fld.getName()));
+            }
         }
     }
 
@@ -181,8 +193,9 @@ public class ListAllNotesFragment extends Fragment {
                 startActivity(i);
             }
         } else if(requestCode == 77 && resultCode == Activity.RESULT_OK){
-            String note_title = data.getStringExtra("NOTE_TITLE");
-            notesList.add(new Note(note_title, R.mipmap.ic_note));
+            String noteTitle = data.getStringExtra("NOTE_TITLE");
+            String noteFolder = data.getStringExtra("NOTE_FOLDER");
+            notesList.add(new Note(noteTitle, noteFolder));
             notesAdapter.notifyDataSetChanged();
         } else if (requestCode == 125 && resultCode == Activity.RESULT_OK) {
             Uri uri = data.getData();

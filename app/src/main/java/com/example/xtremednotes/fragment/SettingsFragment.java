@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,18 +15,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.xtremednotes.ConfigUtil;
+import com.example.xtremednotes.util.ConfigUtil;
 import com.example.xtremednotes.EncryptedFileManager;
-import com.example.xtremednotes.FileUtil;
+import com.example.xtremednotes.util.FileUtil;
 import com.example.xtremednotes.R;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

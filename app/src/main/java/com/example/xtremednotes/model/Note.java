@@ -1,13 +1,16 @@
 package com.example.xtremednotes.model;
 
+import com.example.xtremednotes.R;
+
 public class Note {
 
     private String title;
-    private int img;
+    private String folder;
+    private static int img = R.mipmap.ic_note_foreground;
 
-    public Note(String title, int img){
+    public Note(String title, String folder){
         this.title = title;
-        this.img = img;
+        this.folder = folder;
     }
 
     public void setTitle(String title){
@@ -18,8 +21,16 @@ public class Note {
         this.img = img;
     }
 
+    public void setFolder(String folder){
+        this.folder = folder;
+    }
+
     public String getTitle(){
         return this.title;
+    }
+
+    public String getFolder(){
+        return this.folder;
     }
 
     public int getImg(){

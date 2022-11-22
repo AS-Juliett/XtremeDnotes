@@ -4,21 +4,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.xtremednotes.Config;
-import com.example.xtremednotes.ConfigUtil;
+import com.example.xtremednotes.util.ConfigUtil;
 import com.example.xtremednotes.EncryptedFileManager;
 import com.example.xtremednotes.R;
-
-import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -2,6 +2,8 @@ package com.example.xtremednotes;
 
 import android.content.Context;
 
+import com.example.xtremednotes.util.FileUtil;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;

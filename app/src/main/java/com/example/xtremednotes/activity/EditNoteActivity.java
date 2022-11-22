@@ -3,6 +3,7 @@ package com.example.xtremednotes.activity;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,15 +11,23 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.xtremednotes.Config;
 import com.example.xtremednotes.EncryptedFileManager;
 import com.example.xtremednotes.R;
+import com.example.xtremednotes.util.ConfigUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class EditNoteActivity extends AppCompatActivity {
 
@@ -26,6 +35,7 @@ public class EditNoteActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private String editName;
     private EditText noteText;
+    private String selectedFolder;
 
     private void saveNote() {
         String noteContent = noteText.getText().toString();
@@ -37,8 +47,17 @@ public class EditNoteActivity extends AppCompatActivity {
     }
 
     private boolean validateTitle(String noteTitle){
-        File file = new File(getFilesDir()+"/"+noteTitle+".txt");
+        File file = new File(getFilesDir(),noteTitle+".txt");
         return file.exists();
+    }
+
+    private boolean validate(){
+        if(editName != null){
+            File fileParent = new File(getFilesDir(), selectedFolder);
+            File file = new File(fileParent, editName+".txt");
+            return file.exists();
+        }
+        return true;
     }
 
     public void onClickSaveNote() {
@@ -76,6 +95,7 @@ public class EditNoteActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,10 +131,44 @@ public class EditNoteActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_save) {
-            onClickSaveNote();
-            return (true);
+        switch (item.getItemId()){
+            case R.id.action_save:
+                onClickSaveNote();
+                return (true);
+            case R.id.action_select_folder:
+                selectFolder();
         }
         return(super.onOptionsItemSelected(item));
+    }
+
+    public void selectFolder(){
+        Spinner folderSelector = new Spinner(this);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item, ConfigUtil.convertObject(ConfigUtil.getFolders(this)));
+        folderSelector.setAdapter(adapter);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Choose a folder")
+                .setView(folderSelector)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        selectedFolder = ConfigUtil.encodeBase64(folderSelector.getSelectedItem().toString());
+                        if(validate()){
+                            Toast.makeText(EditNoteActivity.this,
+                                    "Note with the same title already exists in the selected folder",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            moveNote();
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
+    }
+
+    public void moveNote(){
+
     }
 }

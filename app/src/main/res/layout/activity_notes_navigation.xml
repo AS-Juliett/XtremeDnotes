@@ -49,11 +49,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginTop="50dp">
         <Button
             android:id="@+id/manageButton"
             android:background="@drawable/rounded_btn"
-            android:text="Manage"
+            android:text="@string/manage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

@@ -9,30 +9,18 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
-import com.example.xtremednotes.ConfigUtil;
+import com.example.xtremednotes.util.ConfigUtil;
 import com.example.xtremednotes.R;
 import com.example.xtremednotes.fragment.ListAllNotesFragment;
 import com.example.xtremednotes.fragment.SettingsFragment;
 import com.google.android.material.navigation.NavigationView;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public class NotesNavigationActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -41,10 +29,9 @@ public class NotesNavigationActivity extends AppCompatActivity implements Naviga
     private FrameLayout frameLayout;
     private NavigationView navigationView;
     private CircleImageView imageNav;
+    private Menu subMenu;
     private String exportName = "export";
-    private static String manage = "Manage categories";
-    private static String defaultCategory = "Uncategorized";
-    private Object[] categoriesList;
+    private static String defaultFolder = "Uncategorized";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +50,8 @@ public class NotesNavigationActivity extends AppCompatActivity implements Naviga
         frameLayout = findViewById(R.id.frameLayout);
         navigationView = findViewById(R.id.navigationView);
         navigationView.setNavigationItemSelectedListener(this);
-        getCategories();
+        subMenu = navigationView.getMenu().addSubMenu("Folders");
+        ConfigUtil.setFolders(this, subMenu, defaultFolder);
         View nView = navigationView.getHeaderView(0);
         imageNav = nView.findViewById(R.id.imageNav);
         ConfigUtil.setAvatar(this, imageNav);
@@ -120,24 +108,6 @@ public class NotesNavigationActivity extends AppCompatActivity implements Naviga
         return false;
     }
 
-    private void getCategories(){
-        Supplier<Stream<String>> dirSupplier = () ->
-                Arrays.stream(Objects.requireNonNull(this.getFilesDir().listFiles(File::isDirectory))).map(File::getName);
-        categoriesList = dirSupplier.get().toArray();
-        //Log.d("dir no", String.valueOf(categoriesList.length));
-        //for (Object dir: categoriesList) { Log.d("dir", dir.toString()); }
-        //dirSupplier.get().forEach((dir) -> Log.d("dir", dir));
-        Menu subMenu = navigationView.getMenu().addSubMenu("Categories");
-
-        MenuItem defItem = subMenu.add(defaultCategory);
-        defItem.setIcon(R.mipmap.ic_note_foreground);
-
-        for (Object dir: categoriesList) {
-            MenuItem mi = subMenu.add(dir.toString());
-            mi.setIcon(R.mipmap.ic_note_foreground);
-        }
-    }
-
     private void closeDrawer(){
         if (drawerLayout.isDrawerOpen(GravityCompat.START)){
             drawerLayout.closeDrawer(GravityCompat.START);
@@ -152,7 +122,7 @@ public class NotesNavigationActivity extends AppCompatActivity implements Naviga
     }
 
     private void onClickManage(){
-        Intent i = new Intent(this, ManageCategoriesActivity.class);
+        Intent i = new Intent(this, ManageFoldersActivity.class);
         NotesNavigationActivity.this.startActivity(i);
     }
 
@@ -160,5 +130,6 @@ public class NotesNavigationActivity extends AppCompatActivity implements Naviga
     protected void onResume() {
         super.onResume();
         ConfigUtil.setAvatar(this, imageNav);
+        ConfigUtil.setFolders(this, subMenu, defaultFolder);
     }
 }

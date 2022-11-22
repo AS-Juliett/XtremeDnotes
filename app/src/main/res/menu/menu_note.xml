@@ -8,4 +8,9 @@
         android:orderInCategory="100"
         android:title="@string/save_menu"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/action_select_folder"
+        android:orderInCategory="100"
+        android:title="@string/select_folder_menu"
+        app:showAsAction="collapseActionView" />
 </menu>

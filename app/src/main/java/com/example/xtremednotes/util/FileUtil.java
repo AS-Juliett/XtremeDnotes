@@ -1,4 +1,4 @@
-package com.example.xtremednotes;
+package com.example.xtremednotes.util;
 
 import android.net.Uri;
 

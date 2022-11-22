@@ -10,8 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BadApp">
         <activity
-            android:name=".activity.ManageCategoriesActivity"
-            android:exported="false" />
+            android:name=".activity.ManageFoldersActivity"
+            android:exported="false"
+            android:parentActivityName=".activity.NotesNavigationActivity"/>
         <activity
             android:name=".activity.PasswordActivity"
             android:exported="false" />
