@@ -22,6 +22,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -107,6 +108,7 @@ public class EncryptedFileManager {
     }
 
     public static final String STORE_VERSION_KEY = "store_version";
+    public static final String FILE_VERSION_CURRENT = "1";
     public static final String STORE_VERSION_CURRENT = "2";
 
     private IPasswordManager getPasswordManager(Context ctx, String version) {
@@ -123,15 +125,34 @@ public class EncryptedFileManager {
     private IPasswordManager inputMgr;
     private IPasswordManager outputMgr;
 
+    private class AppVersion {
+        String passwordVersion;
+        String fileVersion;
+        public AppVersion(String pv, String fv) {
+            this.passwordVersion = pv;
+            this.fileVersion = fv;
+        }
+    }
+
+    private AppVersion getVersions(Context ctx) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
+        String appVersion = sharedPref.getString(STORE_VERSION_KEY, "1.0");
+        String[] tokens = appVersion.split("\\.");
+        if (tokens.length == 1) {
+            return new AppVersion(tokens[0], "0");
+        }
+        return new AppVersion(tokens[0], tokens.length < 2 ? "0" : tokens[1]);
+    }
+
     public boolean tryInitKey(Context ctx) {
         if (this.defaultKey != null) {
             return true;
         }
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
-        String version = sharedPref.getString(STORE_VERSION_KEY, "1");
 
-        inputMgr = getPasswordManager(ctx, version);
-        if (version.equals(STORE_VERSION_CURRENT)) {
+        AppVersion av = this.getVersions(ctx);
+
+        inputMgr = getPasswordManager(ctx, av.passwordVersion);
+        if (av.passwordVersion.equals(STORE_VERSION_CURRENT)) {
             outputMgr = inputMgr;
         } else {
             outputMgr = getPasswordManager(ctx, STORE_VERSION_CURRENT);
@@ -156,6 +177,19 @@ public class EncryptedFileManager {
             inputMgr = outputMgr;
         }
         return true;
+    }
+
+    public void updateVersion(Context ctx) {
+        AppVersion av = this.getVersions(ctx);
+        if (av.fileVersion.equals("0")) {
+            traverse(ctx.getFilesDir(), (File f) -> {
+                f.renameTo(new File(f.getParent(), FileUtil.fromNoteName(f.getName())));
+            });
+        }
+
+        String newAppVersion = STORE_VERSION_CURRENT + "." + FILE_VERSION_CURRENT;
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
+        sharedPref.edit().putString(STORE_VERSION_KEY, newAppVersion).commit();
     }
 
     public File saveFile(Context ctx, String filename, byte[] content) throws FileNotFoundException {
@@ -254,7 +288,7 @@ public class EncryptedFileManager {
                 throw new InvalidArchiveException();
             }
             if (ze == null) break;
-            al.add(ze.getName());
+            al.add(FileUtil.toNoteName(ze.getName()));
         }
         try {
             zis.close();

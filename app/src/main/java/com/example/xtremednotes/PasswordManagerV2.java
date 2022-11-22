@@ -64,7 +64,7 @@ public class PasswordManagerV2 implements IPasswordManager{
             enc = enc2;
             String b64 = Base64.getEncoder().encodeToString(enc2);
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
-            sharedPref.edit().putString(PASSWORD_KEY, b64).putString(EncryptedFileManager.STORE_VERSION_KEY, "2").commit();
+            sharedPref.edit().putString(PASSWORD_KEY, b64).commit();
         } catch (BadPaddingException | IllegalBlockSizeException e) {
             e.printStackTrace();
         }

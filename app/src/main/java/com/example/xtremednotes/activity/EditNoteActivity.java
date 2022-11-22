@@ -14,11 +14,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.xtremednotes.EncryptedFileManager;
+import com.example.xtremednotes.FileUtil;
 import com.example.xtremednotes.R;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class EditNoteActivity extends AppCompatActivity {
 
@@ -30,7 +32,7 @@ public class EditNoteActivity extends AppCompatActivity {
     private void saveNote() {
         String noteContent = noteText.getText().toString();
         try {
-            EncryptedFileManager.getInstance().saveFile(this, editName, noteContent.getBytes(StandardCharsets.UTF_8));
+            EncryptedFileManager.getInstance().saveFile(this, FileUtil.fromNoteName(editName), noteContent.getBytes(StandardCharsets.UTF_8));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -89,9 +91,10 @@ public class EditNoteActivity extends AppCompatActivity {
             editName = extras.getString(EDIT_NAME_KEY);
         }
         if (editName != null) {
+            String fileName = FileUtil.fromNoteName(editName);
             getSupportActionBar().setTitle(editName.substring(0, editName.lastIndexOf(".")));
             try {
-                byte[] byts = EncryptedFileManager.getInstance().readFile(new File(getFilesDir(), editName));
+                byte[] byts = EncryptedFileManager.getInstance().readFile(new File(getFilesDir(), fileName));
                 Log.d("WKD", ""+byts.length);
                 noteText.setText(new String(byts));
             } catch (FileNotFoundException e) {

@@ -165,7 +165,7 @@ public class ListAllNotesFragment extends Fragment {
                 .collect(Collectors.toList()).toArray(new File[]{});
         assert files != null;
         for (int i = 0; i < files.length; i++) {
-            notesList.add(new Note(files[i].getName(),R.mipmap.ic_note_foreground));
+            notesList.add(new Note(FileUtil.toNoteName(files[i].getName()),R.mipmap.ic_note_foreground));
         }
     }
 

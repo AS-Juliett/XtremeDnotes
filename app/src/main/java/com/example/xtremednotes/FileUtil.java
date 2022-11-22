@@ -2,12 +2,14 @@ package com.example.xtremednotes;
 
 import android.net.Uri;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class FileUtil {
 
@@ -38,6 +40,22 @@ public class FileUtil {
         while ((n = is.read(transferBuf)) != -1) {
             os.write(transferBuf, 0, n);
         }
+    }
+
+    public static String toNoteName(String fileName) {
+        String[] tokens = fileName.split("\\.(?=[^\\.]+$)");
+        if (tokens.length < 2) {
+            return fileName;
+        }
+        return new String(Base64.getDecoder().decode(tokens[0]), StandardCharsets.UTF_8) + "." + tokens[1];
+    }
+
+    public static String fromNoteName(String noteName) {
+        String[] tokens = noteName.split("\\.(?=[^\\.]+$)");
+        if (tokens.length < 2) {
+            return noteName;
+        }
+        return Base64.getEncoder().encodeToString(tokens[0].getBytes(StandardCharsets.UTF_8)) + "." + tokens[1];
     }
 
 }
