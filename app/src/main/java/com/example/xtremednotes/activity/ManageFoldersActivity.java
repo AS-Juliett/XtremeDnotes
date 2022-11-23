@@ -50,7 +50,7 @@ public class ManageFoldersActivity extends AppCompatActivity {
         loadFolders();
 
         foldersAdapter = new FoldersAdapter(folderList,
-                folder -> editName(),
+                folder -> editName(folder),
                 (adapter, folder) -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -59,6 +59,9 @@ public class ManageFoldersActivity extends AppCompatActivity {
                     builder.setPositiveButton("Yes", (dialog, which) -> {
                         File file = new File(this.getFilesDir(), folder.getName());
                         if(file.exists()){
+                            for(File f : file.listFiles()) {
+                                f.delete();
+                            }
                             file.delete();
                             Toast.makeText(this,
                                     ConfigUtil.decodeBase64(folder.getName())+" deleted",
@@ -88,8 +91,35 @@ public class ManageFoldersActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void editName(){
-        Toast.makeText(ManageFoldersActivity.this, "To do edit", Toast.LENGTH_SHORT).show();
+    private void editName(Folder folder){
+        EditText et = new EditText(this);
+        et.setHint(R.string.folder_hint);
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Edit folder name")
+                .setView(et)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String folderName = ConfigUtil.encodeBase64(et.getText().toString());
+                        if(validateName(folderName)){
+                            Toast.makeText(ManageFoldersActivity.this,
+                                    "Folder with given name already exists",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            File dir = getApplicationContext().getFilesDir();
+                            File fld = new File(dir, folder.getName());
+                            if (fld.exists()) {
+                                File nfld = new File(dir, folderName);
+                                fld.renameTo(nfld);
+                            }
+                            loadFolders();
+                            foldersAdapter.notifyDataSetChanged();
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
     }
 
     private void onClickCreate(){
