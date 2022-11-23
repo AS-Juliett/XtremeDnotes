@@ -8,6 +8,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -50,6 +51,7 @@ public class EditNoteActivity extends AppCompatActivity {
     private Menu menu;
     private MenuItem colorSpinner;
     private boolean isEditing = false;
+    private int selColor = -1;
 
     private String makeFullName(String folder, String name) {
         String ret = "";
@@ -60,7 +62,9 @@ public class EditNoteActivity extends AppCompatActivity {
     }
 
     private void setColor(int color) {
-        background.setBackgroundColor(ConfigUtil.convertColor(color));
+        this.selColor = color;
+        int c = ConfigUtil.convertColor(color);
+        background.setBackgroundColor(c);
     }
 
     private void saveNote(String newName, String oldName) {
@@ -71,7 +75,11 @@ public class EditNoteActivity extends AppCompatActivity {
                 File f = new File(getFilesDir(), makeFullName(folderName, FileUtil.fromNoteName(oldName)));
                 f.delete();
             }
-            EncryptedFileManager.getInstance().saveFile(this, encName, selectedFolder, "green", noteContent.getBytes(StandardCharsets.UTF_8));
+            String theme = "undefined";
+            if (selColor != -1) {
+                theme = ConfigUtil.getColors()[selColor];
+            }
+            EncryptedFileManager.getInstance().saveFile(this, encName, selectedFolder, theme, noteContent.getBytes(StandardCharsets.UTF_8));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -157,8 +165,11 @@ public class EditNoteActivity extends AppCompatActivity {
                     file = new File(parent, fileName);
                 }
                 NoteContent nc = EncryptedFileManager.getInstance().readFile(file);
-                Toast.makeText(this, nc.theme, Toast.LENGTH_SHORT).show();
-                noteText.setText(new String(nc.content));
+                int c = Arrays.asList(ConfigUtil.getColors()).indexOf(nc.theme);
+                if (c != -1) {
+                    setColor(c);
+                }
+                noteText.setText(nc.content);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }

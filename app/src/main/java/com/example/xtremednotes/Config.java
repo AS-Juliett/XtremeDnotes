@@ -24,7 +24,6 @@ public class Config {
 
     private Config() {
         configFile = new File(Environment.getExternalStorageDirectory(), CONFIG_FILENAME);
-        Log.d("WKD", configFile.getAbsolutePath());
         props = new Properties();
         if (configFile.exists()) {
             this.load();

@@ -122,7 +122,6 @@ public class ListAllNotesFragment extends Fragment {
                 .setAction(Intent.ACTION_GET_CONTENT);
 
         startActivityForResult(Intent.createChooser(intent, "Select a file"), 123);
-        Log.d("WKD", "act");
     }
 
     public void onClickFileExport() {

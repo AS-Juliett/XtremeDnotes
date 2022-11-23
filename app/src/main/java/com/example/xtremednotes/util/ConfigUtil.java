@@ -2,6 +2,7 @@ package com.example.xtremednotes.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -39,11 +40,16 @@ public class ConfigUtil {
     }
 
     public static String[] getColors(){
-        return new String[]{"Black", "White"};
+        return new String[]{"white", "black", "red", "green", "blue"};
     }
 
     public static int convertColor(int pos){
-        int[] colors = new int[]{R.color.black, R.color.white};
+        int[] colors = new int[]{
+                Color.TRANSPARENT,
+                Color.rgb(0x99, 0x99, 0x99),
+                Color.rgb(186, 105, 105),
+                Color.rgb(136, 225, 136),
+                Color.rgb(97, 193, 223)};
 
         return colors[pos];
     }
