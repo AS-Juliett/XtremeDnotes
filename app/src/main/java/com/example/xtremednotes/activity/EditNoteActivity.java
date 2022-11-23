@@ -173,9 +173,8 @@ public class EditNoteActivity extends AppCompatActivity {
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-        }
-        else{
-            getSupportActionBar().setTitle("");
+        } else {
+            getSupportActionBar().setTitle("New note");
         }
     }
 
