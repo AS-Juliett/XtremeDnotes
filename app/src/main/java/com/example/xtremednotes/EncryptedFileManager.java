@@ -217,10 +217,6 @@ public class EncryptedFileManager {
         return readFileInternal(file, defaultKey);
     }
 
-    public byte[] readFile(File file, SecretKey key) throws FileNotFoundException {
-        return readFileInternal(file, key);
-    }
-
     public byte[] readFileInternal(File file, SecretKey key) throws FileNotFoundException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         FileInputStream stream1 = new FileInputStream(file);
@@ -255,9 +251,9 @@ public class EncryptedFileManager {
 
     public class InvalidArchiveException extends Exception {}
 
-    public void importArchive(Context ctx, String filePath) throws IOException {
+    public void importArchive(Context ctx, String filePath, SecretKey sk) throws IOException {
         File fo = new File(filePath);
-        CipherInputStream cis = new CipherInputStream(new FileInputStream(fo), this.getCipher(Cipher.DECRYPT_MODE));
+        CipherInputStream cis = new CipherInputStream(new FileInputStream(fo), this.getCipher(sk, Cipher.DECRYPT_MODE));
         ZipInputStream zis = new ZipInputStream(cis);
         ZipEntry ze;
         while ((ze = zis.getNextEntry()) != null) {

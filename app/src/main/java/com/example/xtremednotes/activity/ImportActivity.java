@@ -32,7 +32,7 @@ public class ImportActivity extends AppCompatActivity {
 
     public void onClickImport(View v) {
         try {
-            EncryptedFileManager.getInstance().importArchive(this, filename);
+            EncryptedFileManager.getInstance().importArchive(this, filename, key);
             finish();
         } catch (IOException e) {
             e.printStackTrace();
@@ -45,6 +45,7 @@ public class ImportActivity extends AppCompatActivity {
         SecretKey secretKey = new SecretKeySpec(key, "AES");
         try {
             EncryptedFileManager.getInstance().readArchive(filename, secretKey);
+            this.key = secretKey;
         } catch (EncryptedFileManager.InvalidArchiveException e) {
             return false;
         }
