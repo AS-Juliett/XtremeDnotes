@@ -38,6 +38,16 @@ public class ConfigUtil {
         return dirSupplier.get().toArray();
     }
 
+    public static String[] getColors(){
+        return new String[]{"Black", "White"};
+    }
+
+    public static int convertColor(int pos){
+        int[] colors = new int[]{R.color.black, R.color.white};
+
+        return colors[pos];
+    }
+
     public static void setFolders(Context context, Menu subMenu, String defaultFolder) {
         Object[] foldersList = getFolders(context);
         subMenu.clear();

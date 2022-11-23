@@ -2,6 +2,7 @@ package com.example.xtremednotes.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.MenuItemCompat;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -11,6 +12,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -40,6 +43,11 @@ public class EditNoteActivity extends AppCompatActivity {
     private String folderName;
     private EditText noteText;
     private String selectedFolder;
+    private LinearLayout background;
+    private int selectedColor;
+    private String[] colorList;
+    private Menu menu;
+    private MenuItem colorSpinner;
     private boolean isEditing = false;
 
     private String makeFullName(String folder, String name) {
@@ -48,6 +56,10 @@ public class EditNoteActivity extends AppCompatActivity {
             ret += folder + "/";
         }
         return ret + name;
+    }
+
+    private void setColor(int color) {
+        background.setBackgroundColor(ConfigUtil.convertColor(color));
     }
 
     private void saveNote() {
@@ -125,6 +137,9 @@ public class EditNoteActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        background = findViewById(R.id.background);
+        colorList = ConfigUtil.getColors();
+
         noteText = findViewById(R.id.editTextTextMultiLine);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -159,6 +174,22 @@ public class EditNoteActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_note, menu);
+        colorSpinner = menu.findItem(R.id.colorSpinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item, colorList);
+        Spinner spinner = (Spinner) MenuItemCompat.getActionView(colorSpinner);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                setColor(i);
+            }
+
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                return;
+            }
+        });
+
+        this.menu = menu;
         return true;
     }
 
