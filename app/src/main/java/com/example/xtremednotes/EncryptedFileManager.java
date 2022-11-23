@@ -196,7 +196,7 @@ public class EncryptedFileManager {
 
     public File saveFile(Context ctx, String filename, String folder, byte[] content) throws FileNotFoundException {
         File file;
-        if(folder == null){
+        if(folder == null || folder.equals("files")){
             file = new File(ctx.getFilesDir(), filename);
         } else{
             File parent = new File(ctx.getFilesDir(), folder);

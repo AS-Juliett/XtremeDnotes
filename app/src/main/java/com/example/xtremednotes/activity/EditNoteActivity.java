@@ -40,11 +40,25 @@ public class EditNoteActivity extends AppCompatActivity {
     private String folderName;
     private EditText noteText;
     private String selectedFolder;
+    private boolean isEditing = false;
+
+    private String makeFullName(String folder, String name) {
+        String ret = "";
+        if (folder != null && !folder.equals("files")) {
+            ret += folder + "/";
+        }
+        return ret + name;
+    }
 
     private void saveNote() {
         String noteContent = noteText.getText().toString();
         try {
-            EncryptedFileManager.getInstance().saveFile(this, FileUtil.fromNoteName(editName), selectedFolder, noteContent.getBytes(StandardCharsets.UTF_8));
+            String encName = FileUtil.fromNoteName(editName);
+            if (isEditing && !selectedFolder.equals(folderName)) {
+                File f = new File(getFilesDir(), makeFullName(folderName, encName));
+                f.delete();
+            }
+            EncryptedFileManager.getInstance().saveFile(this, encName, selectedFolder, noteContent.getBytes(StandardCharsets.UTF_8));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -54,15 +68,15 @@ public class EditNoteActivity extends AppCompatActivity {
         if(selectedFolder != null){
             return validate(noteTitle);
         } else {
-            File file = new File(getFilesDir(),noteTitle+".txt");
+            File file = new File(getFilesDir(),noteTitle);
             return file.exists();
         }
     }
 
     private boolean validate(String noteTile){
-        if(editName != null){
+        if(noteTile != null){
             File fileParent = new File(getFilesDir(), selectedFolder);
-            File file = new File(fileParent, noteTile+".txt");
+            File file = new File(fileParent, noteTile);
             return file.exists();
         }
         return false;
@@ -77,13 +91,13 @@ public class EditNoteActivity extends AppCompatActivity {
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            String noteTitle = FileUtil.fromNoteName(et.getText().toString() + ".txt");
-                            if(validateTitle(noteTitle)){
+                            String noteTitle = et.getText().toString();
+                            if(validateTitle(FileUtil.fromNoteName(noteTitle+".txt"))){
                                 Toast.makeText(EditNoteActivity.this,
                                         "Note with given title already exists",
                                         Toast.LENGTH_SHORT).show();
                             } else {
-                                editName = noteTitle;
+                                editName = noteTitle + ".txt";
                                 Intent data = new Intent();
                                 data.putExtra("NOTE_TITLE", editName);
                                 data.putExtra("NOTE_FOLDER", selectedFolder);
@@ -117,13 +131,20 @@ public class EditNoteActivity extends AppCompatActivity {
             editName = extras.getString(EDIT_NAME_KEY);
             folderName = extras.getString(FOLDER_KEY);
             selectedFolder = folderName;
+            isEditing = true;
         }
         if (editName != null) {
-            String tokens[] = editName.split("/");
-            String notName = FileUtil.toNoteName(tokens[tokens.length-1]);
-            getSupportActionBar().setTitle(notName.substring(0, notName.lastIndexOf(".")));
+            String fileName = FileUtil.fromNoteName(editName);
+            getSupportActionBar().setTitle(editName.substring(0, editName.lastIndexOf(".")));
             try {
-                byte[] byts = EncryptedFileManager.getInstance().readFile(new File(getFilesDir(), editName));
+                File file;
+                if(folderName == null || folderName.equals("files")){
+                    file = new File(getFilesDir(), fileName);
+                } else{
+                    File parent = new File(getFilesDir(), folderName);
+                    file = new File(parent, fileName);
+                }
+                byte[] byts = EncryptedFileManager.getInstance().readFile(file);
                 Log.d("WKD", ""+byts.length);
                 noteText.setText(new String(byts));
             } catch (FileNotFoundException e) {
