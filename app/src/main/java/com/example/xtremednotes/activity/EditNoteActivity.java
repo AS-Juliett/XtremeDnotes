@@ -62,12 +62,12 @@ public class EditNoteActivity extends AppCompatActivity {
         background.setBackgroundColor(ConfigUtil.convertColor(color));
     }
 
-    private void saveNote() {
+    private void saveNote(String newName, String oldName) {
         String noteContent = noteText.getText().toString();
         try {
-            String encName = FileUtil.fromNoteName(editName);
-            if (isEditing && !selectedFolder.equals(folderName)) {
-                File f = new File(getFilesDir(), makeFullName(folderName, encName));
+            String encName = FileUtil.fromNoteName(newName);
+            if (isEditing && (!selectedFolder.equals(folderName) || !oldName.equals(newName))) {
+                File f = new File(getFilesDir(), makeFullName(folderName, FileUtil.fromNoteName(oldName)));
                 f.delete();
             }
             EncryptedFileManager.getInstance().saveFile(this, encName, selectedFolder, noteContent.getBytes(StandardCharsets.UTF_8));
@@ -95,39 +95,35 @@ public class EditNoteActivity extends AppCompatActivity {
     }
 
     public void onClickSaveNote() {
-        if (editName == null) {
-            EditText et = new EditText(this);
-            new AlertDialog.Builder(this)
-                    .setTitle("Save as")
-                    .setView(et)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            String noteTitle = et.getText().toString();
-                            if(validateTitle(FileUtil.fromNoteName(noteTitle+".txt"))){
-                                Toast.makeText(EditNoteActivity.this,
-                                        "Note with given title already exists",
-                                        Toast.LENGTH_SHORT).show();
-                            } else {
-                                editName = noteTitle + ".txt";
-                                Intent data = new Intent();
-                                data.putExtra("NOTE_TITLE", editName);
-                                data.putExtra("NOTE_FOLDER", selectedFolder);
-                                setResult(RESULT_OK, data);
-                                saveNote();
-                                EditNoteActivity.this.finish();
-                            }
+        EditText et = new EditText(this);
+        final String suggestedName = editName != null ? editName.substring(0, editName.lastIndexOf(".")) : "";
+        et.setText(suggestedName);
+        new AlertDialog.Builder(this)
+                .setTitle("Save as")
+                .setView(et)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String noteTitle = et.getText().toString();
+                        if(!(suggestedName.equals(noteTitle) && selectedFolder.equals(folderName)) && validateTitle(FileUtil.fromNoteName(noteTitle+".txt"))){
+                            Toast.makeText(EditNoteActivity.this,
+                                    "Note with given title already exists",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            String oldName = editName;
+                            editName = noteTitle + ".txt";
+                            Intent data = new Intent();
+                            data.putExtra("NOTE_TITLE", editName);
+                            data.putExtra("NOTE_FOLDER", selectedFolder);
+                            setResult(RESULT_OK, data);
+                            saveNote(editName, oldName);
+                            EditNoteActivity.this.finish();
                         }
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .create()
-                    .show();
-        } else {
-            saveNote();
-            Toast.makeText(EditNoteActivity.this,
-                    "Saved changes",
-                    Toast.LENGTH_SHORT).show();
-        }
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
     }
 
     @Override
