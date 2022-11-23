@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.example.xtremednotes.Config;
 import com.example.xtremednotes.EncryptedFileManager;
+import com.example.xtremednotes.NoteContent;
 import com.example.xtremednotes.util.FileUtil;
 import com.example.xtremednotes.R;
 import com.example.xtremednotes.util.ConfigUtil;
@@ -70,7 +71,7 @@ public class EditNoteActivity extends AppCompatActivity {
                 File f = new File(getFilesDir(), makeFullName(folderName, FileUtil.fromNoteName(oldName)));
                 f.delete();
             }
-            EncryptedFileManager.getInstance().saveFile(this, encName, selectedFolder, noteContent.getBytes(StandardCharsets.UTF_8));
+            EncryptedFileManager.getInstance().saveFile(this, encName, selectedFolder, "green", noteContent.getBytes(StandardCharsets.UTF_8));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -155,9 +156,9 @@ public class EditNoteActivity extends AppCompatActivity {
                     File parent = new File(getFilesDir(), folderName);
                     file = new File(parent, fileName);
                 }
-                byte[] byts = EncryptedFileManager.getInstance().readFile(file);
-                Log.d("WKD", ""+byts.length);
-                noteText.setText(new String(byts));
+                NoteContent nc = EncryptedFileManager.getInstance().readFile(file);
+                Toast.makeText(this, nc.theme, Toast.LENGTH_SHORT).show();
+                noteText.setText(new String(nc.content));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }

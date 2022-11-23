@@ -194,7 +194,7 @@ public class EncryptedFileManager {
         sharedPref.edit().putString(STORE_VERSION_KEY, newAppVersion).commit();
     }
 
-    public File saveFile(Context ctx, String filename, String folder, byte[] content) throws FileNotFoundException {
+    public File saveFile(Context ctx, String filename, String folder, String theme, byte[] content) throws FileNotFoundException {
         File file;
         if(folder == null || folder.equals("files")){
             file = new File(ctx.getFilesDir(), filename);
@@ -204,7 +204,8 @@ public class EncryptedFileManager {
         }
         CipherOutputStream cos = new CipherOutputStream(new FileOutputStream(file), this.getCipher(Cipher.ENCRYPT_MODE));
         try {
-            cos.write(content);
+            String c = theme + "\n" + new String(content);
+            cos.write(c.getBytes(StandardCharsets.UTF_8));
             cos.flush();
             cos.close();
         } catch (IOException e) {
@@ -213,11 +214,11 @@ public class EncryptedFileManager {
         return file;
     }
 
-    public byte[] readFile(File file) throws FileNotFoundException {
+    public NoteContent readFile(File file) throws FileNotFoundException {
         return readFileInternal(file, defaultKey);
     }
 
-    public byte[] readFileInternal(File file, SecretKey key) throws FileNotFoundException {
+    public NoteContent readFileInternal(File file, SecretKey key) throws FileNotFoundException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         FileInputStream stream1 = new FileInputStream(file);
         CipherInputStream stream = new CipherInputStream(stream1, this.getCipher(Cipher.DECRYPT_MODE));
@@ -226,7 +227,8 @@ public class EncryptedFileManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return bos.toByteArray();
+        String[] tokens = bos.toString().split("\n", 2);
+        return new NoteContent(tokens[0], tokens.length > 1 ? tokens[1] : "");
     }
 
     private Cipher getCipher(SecretKey sk, int mode) {
