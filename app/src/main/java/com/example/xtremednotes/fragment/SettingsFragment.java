@@ -19,6 +19,7 @@ import com.example.xtremednotes.util.ConfigUtil;
 import com.example.xtremednotes.EncryptedFileManager;
 import com.example.xtremednotes.util.FileUtil;
 import com.example.xtremednotes.R;
+import com.example.xtremednotes.util.VerifyUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -99,6 +100,11 @@ public class SettingsFragment extends Fragment {
                 .setView(et)
                 .setPositiveButton("OK", (dialogInterface, i) -> {
                     String newPassword = et.getText().toString();
+                    String res = VerifyUtil.verifyPassword(newPassword);
+                    if (res != null) {
+                        Toast.makeText(getContext(), res, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     EncryptedFileManager.getInstance().updateDefaultKey(view.getContext(), newPassword);
                     Toast.makeText(view.getContext(),
                                 "Updated password",

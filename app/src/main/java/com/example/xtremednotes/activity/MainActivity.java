@@ -14,6 +14,7 @@ import com.example.xtremednotes.Config;
 import com.example.xtremednotes.util.ConfigUtil;
 import com.example.xtremednotes.EncryptedFileManager;
 import com.example.xtremednotes.R;
+import com.example.xtremednotes.util.VerifyUtil;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,6 +42,11 @@ public class MainActivity extends AppCompatActivity {
                     mainPasswordInput.setText("");
                     return;
                 } else if (needsKey) {
+                    String res = VerifyUtil.verifyPassword(password);
+                    if (res != null) {
+                        Toast.makeText(MainActivity.this, res, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     EncryptedFileManager.getInstance().updateDefaultKey(MainActivity.this, password);
                     Toast.makeText(MainActivity.this, "New password set", Toast.LENGTH_SHORT).show();
                     MainActivity.this.needsKey = false;
